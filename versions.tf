@@ -8,22 +8,22 @@ terraform {
     }
   }
 
-  # Remote state — one shared storage account holds state for ALL environments,
-  # but each environment gets its OWN file (the "key") so dev/qa/prod never
-  # overwrite each other's state.
+  # Terraform Cloud manages state and runs for this config — no Azure
+  # storage account needed for state anymore. Replace "your-org-name" and
+  # "your-workspace-name" with the values from your Terraform Cloud
+  # organization/workspace (app.terraform.io).
   #
-  # "key" is deliberately left out here (partial backend config) because it
-  # changes per environment. Supply it at init time instead:
-  #
-  #   terraform init -backend-config="key=dev/terraform.tfstate"
-  #   terraform init -backend-config="key=qa/terraform.tfstate"
-  #   terraform init -backend-config="key=prod/terraform.tfstate"
-  #
-  # If you switch environments in the same local folder, re-run init with the
-  # new key (Terraform will offer to migrate/reconfigure — say yes).
-  backend "azurerm" {
-    resource_group_name  = "rg-tfstate"
-    storage_account_name = "sttfstatekaushal01"
-    container_name       = "tfstate"
+  # Since Terraform Cloud VCS-driven runs don't accept a -var-file flag,
+  # create ONE workspace per environment (e.g. func-app-dev, func-app-qa,
+  # func-app-prod), each pointed at this same repo, and enter that
+  # environment's variables directly in each workspace's "Variables" tab
+  # (copy the values from the matching environments/*.tfvars file) instead
+  # of relying on the tfvars files for cloud-driven runs.
+  cloud {
+    organization = "DemoOrgPersonal"
+
+    workspaces {
+      name = "Terraform_Practise_Repository"
+    }
   }
 }
