@@ -4,7 +4,7 @@ locals {
   resource_group_name = coalesce(var.resource_group_name, "rg-${local.name_prefix}")
   function_app_name   = coalesce(var.function_app_name, "func-${local.name_prefix}")
   service_plan_name   = coalesce(var.service_plan_name, "plan-${local.name_prefix}")
-  app_insights_name    = coalesce(var.application_insights_name, "appi-${local.name_prefix}")
+  app_insights_name   = coalesce(var.application_insights_name, "appi-${local.name_prefix}")
 
   # Storage account names must be lowercase, alphanumeric only, <= 24 chars.
   storage_account_name = coalesce(

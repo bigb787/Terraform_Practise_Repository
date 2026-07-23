@@ -13,7 +13,7 @@ storage_account_name = null # defaults to sttfpractiseprod
 storage_account_replication_type = "GRS" # geo-redundant for production
 
 service_plan_sku_name = "EP2" # premium plan sized up for production load
-always_on              = true
+always_on             = true
 
 enable_application_insights = true
 

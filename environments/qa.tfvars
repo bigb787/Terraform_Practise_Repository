@@ -11,7 +11,7 @@ function_app_name    = null # defaults to func-tfpractise-qa
 storage_account_name = null # defaults to sttfpractiseqa
 
 service_plan_sku_name = "EP1" # premium plan — VNet integration / warm instances for QA
-always_on              = true
+always_on             = true
 
 enable_application_insights = true
 
