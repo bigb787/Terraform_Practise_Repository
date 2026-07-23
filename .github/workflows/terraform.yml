@@ -1,0 +1,59 @@
+name: Terraform Azure Function App (prod)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.tf"
+      - "environments/prod.tfvars"
+      - ".github/workflows/terraform.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Azure service principal — Terraform actually runs on THIS runner
+  # (workspace Execution Mode = Local), so it needs its own Azure
+  # credentials rather than relying on your local `az login`.
+  # Add these as repo secrets: Settings > Secrets and variables > Actions.
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+  # Terraform Cloud API token — required because versions.tf has a `cloud`
+  # block. Generate one at app.terraform.io > User Settings > Tokens (or a
+  # team/organization token), then add it as a repo secret named
+  # TF_API_TOKEN. This env var name is a Terraform CLI convention it reads
+  # automatically for authenticating to app.terraform.io.
+  TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
+
+jobs:
+  terraform:
+    name: Plan and Apply (prod)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -var-file="environments/prod.tfvars" -out=tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve tfplan

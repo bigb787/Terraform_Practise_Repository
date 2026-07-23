@@ -8,17 +8,17 @@ terraform {
     }
   }
 
-  # Terraform Cloud manages state and runs for this config — no Azure
-  # storage account needed for state anymore. Replace "your-org-name" and
-  # "your-workspace-name" with the values from your Terraform Cloud
-  # organization/workspace (app.terraform.io).
+  # Terraform Cloud (workspace: Terraform_Practise_Repository) tracks state
+  # and run history. Runs are triggered from this local machine via the
+  # normal `terraform plan`/`apply` commands (CLI-driven workflow), so
+  # -var-file works exactly as normal.
   #
-  # Since Terraform Cloud VCS-driven runs don't accept a -var-file flag,
-  # create ONE workspace per environment (e.g. func-app-dev, func-app-qa,
-  # func-app-prod), each pointed at this same repo, and enter that
-  # environment's variables directly in each workspace's "Variables" tab
-  # (copy the values from the matching environments/*.tfvars file) instead
-  # of relying on the tfvars files for cloud-driven runs.
+  # REQUIRED one-time setting: on the workspace's Settings > General page,
+  # set "Execution Mode" to "Local" (not "Remote"). Local execution mode
+  # means Terraform runs using YOUR machine's `az login` session; Terraform
+  # Cloud just records the run and stores the state file. If left on
+  # "Remote", Terraform Cloud would try to run this on its own servers,
+  # which has no access to your local Azure CLI login.
   cloud {
     organization = "DemoOrgPersonal"
 
